@@ -1,0 +1,4 @@
+<li>
+  <%= check_box_tag('participants[]', participant.id, @event.participants.map { |p| p.id }.include?(participant.id)) unless in_form.blank? %>
+  <%= participant.name %>
+</li>

@@ -19,6 +19,11 @@
     <%= f.label :decsription %><br />
     <%= f.text_area :decsription %>
   </div>
+  <div class="field">
+    <ul>
+      <%= render :partial => "participant", :collection => @participants, :locals => { :in_form => true } %>
+    </ul>
+  </div>
   <div class="actions">
     <%= f.submit %>
   </div>

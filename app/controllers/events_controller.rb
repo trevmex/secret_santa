@@ -35,6 +35,7 @@ class EventsController < ApplicationController
   # GET /events/1/edit
   def edit
     @event = Event.find(params[:id])
+    @participants = Participant.all
   end
 
   # POST /events
@@ -44,6 +45,7 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       if @event.save
+        add_participants_to_event(params[:participants])
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render json: @event, status: :created, location: @event }
       else
@@ -60,6 +62,7 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       if @event.update_attributes(params[:event])
+        add_participants_to_event(params[:participants])
         format.html { redirect_to @event, notice: 'Event was successfully updated.' }
         format.json { head :ok }
       else
@@ -73,11 +76,27 @@ class EventsController < ApplicationController
   # DELETE /events/1.json
   def destroy
     @event = Event.find(params[:id])
+    remove_participants_from_event(@event.participants)
     @event.destroy
 
     respond_to do |format|
       format.html { redirect_to events_url }
       format.json { head :ok }
     end
+  end
+  
+  private
+  
+  def add_participants_to_event(participant_ids)
+    participant_ids.each do |participant_id|
+      participant = Participant.find(participant_id)
+      participant.update_attributes(:event_id => @event.id) unless participant.blank?
+    end unless participant_ids.blank?
+  end
+
+  def remove_participants_from_event(participants)
+    participants.each do |participant|
+      participant.update_attributes(:event_id => nil) unless participant.blank?
+    end unless participants.blank?
   end
 end

@@ -10,6 +10,12 @@
   <%= @event.decsription %>
 </p>
 
+<p>
+  <b>Participants</b>
+  <ul>
+    <%= render :partial => "participant", :collection => @event.participants, :locals => { :in_form => false } %>
+  </ul>
+</p>
 
 <%= link_to 'Edit', edit_event_path(@event) %> |
 <%= link_to 'Back', events_path %>
