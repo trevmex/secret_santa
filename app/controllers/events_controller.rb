@@ -46,6 +46,8 @@ class EventsController < ApplicationController
     respond_to do |format|
       if @event.save
         add_participants_to_event(params[:participants])
+        assign_gift_givers(@event)
+        
         format.html { redirect_to @event, notice: 'Event was successfully created.' }
         format.json { render json: @event, status: :created, location: @event }
       else
@@ -63,6 +65,8 @@ class EventsController < ApplicationController
     respond_to do |format|
       if @event.update_attributes(params[:event])
         add_participants_to_event(params[:participants])
+        assign_gift_givers(@event.participants)
+        
         format.html { redirect_to @event, notice: 'Event was successfully updated.' }
         format.json { head :ok }
       else
@@ -98,5 +102,15 @@ class EventsController < ApplicationController
     participants.each do |participant|
       participant.update_attributes(:event_id => nil) unless participant.blank?
     end unless participants.blank?
+  end
+  
+  def assign_gift_givers(participants)
+    participant_ids = participants.map {|p| p.id}
+    participants.each do |participant|
+      usable_participant_ids = participant_ids.reject {|pid| pid == participant.id}
+      gift_giver = usable_participant_ids.shuffle.pop
+      participant.update_attributes({:participant_id => gift_giver})
+      participant_ids.delete_if {|pid| pid == gift_giver}
+    end
   end
 end
